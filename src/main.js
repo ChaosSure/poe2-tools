@@ -2,62 +2,180 @@ import { ESSENCES, icon } from './data/essences.js';
 import './style.css';
 
 const $ = (s) => document.querySelector(s);
-const saved = JSON.parse(localStorage.getItem('poe2-essence-prices') || '{}');
-const savedQty = JSON.parse(localStorage.getItem('poe2-essence-qty') || '{}');
+const load = (k, fallback) => { try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } };
+
 const state = {
-  rate: Number(localStorage.getItem('poe2-rate') || 7150),
-  lf: Number(localStorage.getItem('poe2-lf') || 30),
-  prices: saved,
-  qty: savedQty,
+  currency: localStorage.getItem('poe2-currency') || 'chaos',
+  divChaos: Number(localStorage.getItem('poe2-div-chaos') || 7150),
+  lfPerDiv: Number(localStorage.getItem('poe2-lf-per-div') || 22150),
+  lfCostMode: localStorage.getItem('poe2-lf-mode') || 'divine',
+  lfPerRoll: Number(localStorage.getItem('poe2-lf-roll') || 30),
+  strategy: localStorage.getItem('poe2-strategy') || 'one',
+  prices: load('poe2-essence-prices-v2', {}),
+  qty: load('poe2-essence-qty-v2', {}),
   selected: new Set(ESSENCES.map(([id]) => id)),
   sort: 'profit',
-  source: 'local'
+  provider: '本地价格'
 };
-for (const [id] of ESSENCES) { if (!(id in state.prices)) state.prices[id] = 0; if (!(id in state.qty)) state.qty[id] = 100; }
-const num = (v, fallback = 0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
-const fmt = (v, digits = 3) => num(v).toFixed(digits);
-const price = id => Math.max(0, num(state.prices[id]));
-const qty = id => Math.max(0, num(state.qty[id]));
-const lfCost = () => state.lf / Math.max(1, state.rate);
-const expectedSellValue = id => {
-  const others = ESSENCES.filter(([other]) => other !== id);
-  return others.length ? others.reduce((sum, [other]) => sum + (price(other) > 0 ? 1 / price(other) : 0), 0) / others.length : 0;
-};
-const directValue = id => price(id) > 0 ? 1 / price(id) : 0;
-const unitProfit = id => expectedSellValue(id) - directValue(id) - lfCost();
-const roi = id => directValue(id) > 0 ? unitProfit(id) / directValue(id) : 0;
-function save() { localStorage.setItem('poe2-essence-prices', JSON.stringify(state.prices)); localStorage.setItem('poe2-essence-qty', JSON.stringify(state.qty)); localStorage.setItem('poe2-rate', String(state.rate)); localStorage.setItem('poe2-lf', String(state.lf)); }
-function shell() {
-$('#app').innerHTML=`<header class="topbar"><div class="topbar-inner"><a class="brand" href=".">PoE Tools<span> · 中文版</span></a><nav class="nav"><a class="active">精华</a><a>化石</a><a>催化剂</a><a>精油</a><a>裂界碎片</a><a>其他</a></nav><button class="top-link" data-action="reset">重置</button></div></header>
-<main class="workspace">
-<aside class="panel left-panel"><div class="panel-title"><span>转换设置</span><small>ESSENCE EXCHANGE</small></div>
-<div class="control-block"><label>神圣石汇率</label><div class="input-unit"><input id="rate" type="number" min="1" value="${state.rate}"><span>混沌 / 神圣</span></div></div>
-<div class="control-block"><label>每次转换命能</label><div class="input-unit"><input id="lf" type="number" min="1" value="${state.lf}"><span>命能</span></div></div>
-<div class="control-block"><label>批量数量</label><div class="range-row"><input id="min" type="number" value="50"><span>—</span><input id="max" type="number" value="500"></div><button class="wide-btn" data-action="generate">随机填充数量</button></div>
-<div class="control-block"><label>价格数据</label><div class="source-status"><i></i><span id="sourceText">本地价格</span></div><button class="wide-btn primary" data-action="ninja">从 Ninja 获取价格</button><small class="hint">使用 poe.ninja / economy API；失败时保留本地价格。</small></div>
-<div class="control-block"><label>快速选择</label><div class="button-grid"><button data-action="all">全部</button><button data-action="none">清空</button><button data-action="good">仅盈利</button><button data-action="bad">仅亏损</button></div></div>
-<div class="control-block"><button class="wide-btn" data-action="demo">载入示例价格</button><button class="wide-btn" data-action="zero">清空所有价格</button><button class="wide-btn" data-action="copy">复制盈利精华</button></div>
-<div class="panel-footer"><span>数据自动保存到浏览器</span><button data-action="save">保存</button></div></aside>
-<section class="center-panel"><div class="center-head"><div><h1>精华转换</h1><p>调整数量与市场价格，实时计算每种精华转换的收益。</p></div><div class="head-actions"><button data-action="sort">${state.sort==='profit'?'利润 ↓':'名称 A-Z'}</button></div></div>
-<div class="table-wrap"><table class="profit-table"><thead><tr><th class="check-col"></th><th>精华</th><th>数量</th><th>买入价格</th><th>直接出售</th><th>转换期望</th><th>命能成本</th><th>单件利润</th><th>ROI</th><th>建议</th></tr></thead><tbody id="items"></tbody></table></div></section>
-<aside class="panel right-panel"><div class="panel-title"><span>转换结果</span><small>LIVE SUMMARY</small></div>
-<div class="right-section"><div class="right-label">已选择精华 <strong id="selectedCount">0</strong></div><div id="selectedList" class="selected-list"></div></div>
-<div class="summary-card"><div><span>投入价值</span><strong id="spent">0.000</strong></div><div><span>命能成本</span><strong id="lfCost">0.000</strong></div><div><span>直接出售</span><strong id="direct">0.000</strong></div><div><span>转换后期望</span><strong id="earned">0.000</strong></div></div>
-<div class="net-card"><span>预计净利润</span><strong id="profit">0.000</strong><div>ROI <b id="roi">0.00%</b></div></div>
-<div class="right-section"><div class="right-label">转换建议</div><div id="recommendations" class="recommendations"></div></div></aside></main><footer>PoE Tools · 中文 GoE 风格精华转换器 · 市场价格来源：poe.ninja · 非 Grinding Gear Games 官方项目</footer>`;
+for (const [id] of ESSENCES) {
+  if (!state.prices[id]) state.prices[id] = { buy: 0, sell: 0 };
+  if (!(id in state.qty)) state.qty[id] = 0;
 }
-function visibleRows(){const rows=ESSENCES.map(x=>({x,p:unitProfit(x[0]),r:roi(x[0])}));if(state.sort==='profit')rows.sort((a,b)=>b.p-a.p);else rows.sort((a,b)=>a.x[1].localeCompare(b.x[1],'zh'));return rows;}
-function renderItems(){ $('#items').innerHTML=visibleRows().map(({x,p,r})=>{const id=x[0],selected=state.selected.has(id),profitable=p>=0;return `<tr class="${profitable?'row-good':'row-bad'} ${selected?'':'row-off'}"><td class="check-col"><input data-check="${id}" type="checkbox" ${selected?'checked':''}></td><td><div class="essence-name"><img src="${icon(id)}" onerror="this.style.opacity=.2"><div><strong>${x[1]}</strong><small>${x[2]}</small></div></div></td><td><input class="cell-input qty-input" data-qty="${id}" type="number" min="0" value="${qty(id)}"></td><td><input class="cell-input price-input" data-price="${id}" type="number" min="0" step="0.001" value="${price(id)}"></td><td class="num">${fmt(directValue(id))}</td><td class="num">${fmt(expectedSellValue(id))}</td><td class="num muted">${fmt(lfCost())}</td><td class="num ${profitable?'up':'down'}">${p>=0?'+':''}${fmt(p)}</td><td class="num ${profitable?'up':'down'}">${(r*100).toFixed(1)}%</td><td><span class="status ${profitable?'status-good':'status-bad'}">${profitable?'转换':'出售'}</span></td></tr>`;}).join('');
- document.querySelectorAll('[data-price]').forEach(el=>el.addEventListener('input',e=>{state.prices[e.target.dataset.price]=Math.max(0,num(e.target.value));save();renderAll();}));
- document.querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('input',e=>{state.qty[e.target.dataset.qty]=Math.max(0,num(e.target.value));save();renderResults();renderSelected();}));
- document.querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',e=>{const id=e.target.dataset.check;e.target.checked?state.selected.add(id):state.selected.delete(id);renderItems();renderResults();renderSelected();}));
- $('#selectedCount').textContent=state.selected.size;}
-function renderSelected(){const chosen=[...state.selected];$('#selectedList').innerHTML=chosen.length?chosen.map(id=>{const x=ESSENCES.find(e=>e[0]===id),p=unitProfit(id);return `<div class="selected-item"><img src="${icon(id)}"><span>${x[1]}</span><b class="${p>=0?'up':'down'}">${p>=0?'+':''}${fmt(p)}</b></div>`}).join(''):'<div class="empty">未选择任何精华</div>';}
-function renderResults(){const chosen=[...state.selected];const spent=chosen.reduce((s,id)=>s+qty(id)*directValue(id),0);const conversionCost=chosen.reduce((s,id)=>s+qty(id)*lfCost(),0);const earned=chosen.reduce((s,id)=>s+qty(id)*expectedSellValue(id),0);const net=earned-spent-conversionCost;$('#spent').textContent=fmt(spent);$('#lfCost').textContent=fmt(conversionCost);$('#direct').textContent=fmt(spent);$('#earned').textContent=fmt(earned);$('#profit').textContent=`${net>=0?'+':''}${fmt(net)}`;$('#profit').className=net>=0?'up':'down';$('#roi').textContent=`${spent?(net/spent*100).toFixed(2):'0.00'}%`;const profitable=ESSENCES.map(([id,name])=>({name,p:unitProfit(id)})).filter(x=>x.p>=0).sort((a,b)=>b.p-a.p).slice(0,5);$('#recommendations').innerHTML=profitable.map(x=>`<div><span>${x.name}</span><b class="up">+${fmt(x.p)}</b></div>`).join('')||'<div class="empty">暂无盈利项目</div>';}
-function renderAll(){renderItems();renderSelected();renderResults();}
-function demoPrices(){const values=[18,20,23,25,27,30,34,38,42,48];ESSENCES.forEach(([id],i)=>{state.prices[id]=values[i%values.length];state.qty[id]=100+(i%5)*50;});state.source='demo';save();renderAll();}
-function randomizeQty(){const min=Math.max(0,Math.floor(num($('#min').value,50))),max=Math.max(min,Math.floor(num($('#max').value,500)));ESSENCES.forEach(([id])=>state.qty[id]=Math.floor(Math.random()*(max-min+1))+min);save();renderAll();}
-function copyProfitable(){const text=ESSENCES.filter(([id])=>unitProfit(id)>=0).map(([,name])=>name).join(', ');if(text)navigator.clipboard?.writeText(text);}
-async function loadNinja(){const btn=document.querySelector('[data-action="ninja"]');const old=btn.textContent;btn.disabled=true;btn.textContent='获取中…';$('#sourceText').textContent='正在获取 poe.ninja';try{const urls=['https://poe.ninja/api/data/itemoverview?league=Standard&type=Essence','https://poe.ninja/api/data/itemoverview?league=Standard&type=Essences'];let data=null;for(const url of urls){try{const r=await fetch(url,{headers:{Accept:'application/json'}});if(r.ok){data=await r.json();break;}}catch(e){}}if(!data?.lines?.length)throw new Error('Ninja API unavailable');const map=new Map(data.lines.map(x=>[String(x.name||'').toLowerCase(),x.chaosValue??x.chaosValue??0]));let count=0;for(const [id,cn,en] of ESSENCES){const candidates=[en,`Deafening Essence of ${en.replace(/^Deafening Essence of /,'')}`,id].map(x=>x.toLowerCase());const hit=data.lines.find(x=>candidates.includes(String(x.name||'').toLowerCase()));if(hit&&num(hit.chaosValue)>0){state.prices[id]=1/num(hit.chaosValue);count++;}}state.source='poe.ninja';save();renderAll();$('#sourceText').textContent=`poe.ninja · ${count} 项`;}catch(e){$('#sourceText').textContent='Ninja 获取失败，使用本地价格';alert('poe.ninja API 暂时无法访问。浏览器跨域或接口变更时会发生这种情况，请稍后重试。');}finally{btn.disabled=false;btn.textContent=old;}}
-function bind(){ $('#rate').addEventListener('input',e=>{state.rate=Math.max(1,num(e.target.value,7150));save();renderAll();});$('#lf').addEventListener('input',e=>{state.lf=Math.max(1,num(e.target.value,30));save();renderAll();});document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{const a=button.dataset.action;if(a==='ninja')return loadNinja();if(a==='demo')demoPrices();if(a==='zero'){ESSENCES.forEach(([id])=>state.prices[id]=0);save();renderAll();}if(a==='sort'){state.sort=state.sort==='profit'?'name':'profit';renderAll();}if(a==='all'){state.selected=new Set(ESSENCES.map(([id])=>id));renderAll();}if(a==='none'){state.selected.clear();renderAll();}if(a==='good'){state.selected=new Set(ESSENCES.filter(([id])=>unitProfit(id)>=0).map(([id])=>id));renderAll();}if(a==='bad'){state.selected=new Set(ESSENCES.filter(([id])=>unitProfit(id)<0).map(([id])=>id));renderAll();}if(a==='generate')randomizeQty();if(a==='copy')copyProfitable();if(a==='save'){save();alert('已保存。');}if(a==='reset'){localStorage.clear();location.reload();}}));}
-function render(){shell();bind();renderAll();}render();
+
+const num = (v, f = 0) => Number.isFinite(Number(v)) ? Number(v) : f;
+const fmt = (v, d = 2) => num(v).toFixed(d);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const info = id => state.prices[id] || { buy: 0, sell: 0 };
+
+function toChaos(value) {
+  const v = Math.max(0, num(value));
+  return state.currency === 'chaos' ? v : (v > 0 ? state.divChaos / v : 0);
+}
+function fromChaos(value) {
+  const v = Math.max(0, num(value));
+  return state.currency === 'chaos' ? v : (v > 0 ? state.divChaos / v : 0);
+}
+function buyChaos(id) { return toChaos(info(id).buy); }
+function sellChaos(id) { return toChaos(info(id).sell); }
+function lfChaos() {
+  if (state.lfCostMode === 'chaos') return state.lfPerRoll * state.lfPerDiv;
+  return state.divChaos * (state.lfPerRoll / Math.max(1, state.lfPerDiv));
+}
+function expectedSell(id) {
+  const others = ESSENCES.filter(([other]) => other !== id);
+  const vals = others.map(([other]) => sellChaos(other)).filter(v => v > 0);
+  return vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : 0;
+}
+function profit(id) { return expectedSell(id) - buyChaos(id) - lfChaos(); }
+function roi(id) { const b = buyChaos(id); return b > 0 ? profit(id) / b : 0; }
+function tradeLink(id) {
+  const x = ESSENCES.find(e => e[0] === id);
+  const slug = `deafening-essence-of-${id}`;
+  const q = encodeURIComponent(JSON.stringify({query:{have:['chaos'],want:[slug],status:{option:'online'}}}));
+  return `https://www.pathofexile.com/trade/exchange/Standard?q=${q}`;
+}
+function save() {
+  localStorage.setItem('poe2-currency', state.currency);
+  localStorage.setItem('poe2-div-chaos', String(state.divChaos));
+  localStorage.setItem('poe2-lf-per-div', String(state.lfPerDiv));
+  localStorage.setItem('poe2-lf-mode', state.lfCostMode);
+  localStorage.setItem('poe2-lf-roll', String(state.lfPerRoll));
+  localStorage.setItem('poe2-strategy', state.strategy);
+  localStorage.setItem('poe2-essence-prices-v2', JSON.stringify(state.prices));
+  localStorage.setItem('poe2-essence-qty-v2', JSON.stringify(state.qty));
+}
+
+function shell() {
+  $('#app').innerHTML = `
+  <header class="goe-header"><div class="goe-head-inner">
+    <a class="goe-logo" href=".">Gains of Exile <span>· 中文版</span></a>
+    <nav><a class="active">精华</a><a>催化剂</a><a>化石</a><a>精油</a><a>裂界碎片</a></nav>
+    <div class="head-right"><span>PoE 经济工具</span><button data-action="reset">重置</button></div>
+  </div></header>
+  <main class="goe-layout">
+    <aside class="goe-left">
+      <section class="quick"><h2>快速配置</h2><p>计算最佳精华转换与收益。先设置下面这些项目：</p>
+        <ol><li><b>货币：</b>按混沌石还是神圣石计算？</li><li><b>数量：</b>你有多少精华？</li><li><b>价格：</b>当前市场价格如何？</li><li><b>转换：</b>命能成本是多少？</li></ol>
+      </section>
+      <section class="box"><h3>1. 货币</h3>
+        <div class="field"><label>一件物品成本</label><div class="unit-input"><input id="currencyModeValue" type="number" step="0.01"><select id="currencyMode"><option value="chaos">混沌 / 件</option><option value="divine">件 / 神圣</option></select></div></div>
+        <div class="field"><label>神圣石汇率</label><div class="unit-input"><input id="divChaos" type="number" min="1"><span>混沌</span></div></div>
+        <div class="field"><label>货币显示</label><div class="seg"><button data-currency="chaos" class="${state.currency==='chaos'?'on':''}">混沌 / 件</button><button data-currency="divine" class="${state.currency==='divine'?'on':''}">件 / 神圣</button></div></div>
+      </section>
+      <section class="box"><h3>汇率</h3><div class="rate-line"><b>${fmt(state.divChaos,0)}</b><img src="https://gains-of-exile.vercel.app/images/chaos.png"> = 1 <img src="https://gains-of-exile.vercel.app/images/divine.png"></div><button class="text-btn" data-action="import">导入价格</button></section>
+      <section class="box"><h3>2. 数量</h3><p class="muted">在表格中直接设置数量，或批量生成。勾选第 1 列后生成。</p>
+        <div class="check-row"><button data-action="all">全选</button><button data-action="none">全不选</button><button data-action="good">盈利</button><button data-action="bad">亏损</button></div>
+        <div class="between"><input id="minQty" type="number" value="0"><span>至</span><input id="maxQty" type="number" value="100"> <span>件</span></div><button class="primary-btn" data-action="generate">生成数量</button>
+      </section>
+      <section class="box"><h3>3. 价格</h3><p class="muted">可以直接编辑表格，也可以从价格服务商获取。</p>
+        <div class="provider"><span class="dot"></span><span id="provider">${esc(state.provider)}</span></div>
+        <button class="primary-btn" data-action="ninja">从 poe.ninja 获取</button>
+        <button class="secondary-btn" data-action="demo">载入示例</button>
+      </section>
+      <section class="box"><h3>4. 转换 <img class="tiny-icon" src="https://gains-of-exile.vercel.app/images/flip2.png"></h3>
+        <p class="muted">园艺台转换一次需要命能。精华之间按等概率计算期望值。</p>
+        <div class="field"><label>每次转换命能</label><div class="unit-input"><input id="lfPerRoll" type="number" min="1"><span>命能</span></div></div>
+        <div class="field"><label>1 神圣石可购买</label><div class="unit-input"><input id="lfPerDiv" type="number" min="1"><span>命能</span></div></div>
+        <div class="strategy"><button data-strategy="one" class="${state.strategy==='one'?'on':''}">一步策略</button><button data-strategy="optimal" class="${state.strategy==='optimal'?'on':''}">最优策略</button></div>
+      </section>
+    </aside>
+
+    <section class="goe-center"><div class="center-title"><div><h1>精华</h1><p>价格、转换收益与利润一览</p></div><div class="sort"><span>排序</span><button data-action="sort">${state.sort==='profit'?'利润 ↓':'名称 A-Z'}</button></div></div>
+      <div class="table-scroll"><table><thead><tr><th class="sel">✓</th><th>精华</th><th>数量</th><th>买入</th><th>出售</th><th>转换期望</th><th>命能</th><th>利润</th><th>ROI</th><th>建议</th></tr></thead><tbody id="table"></tbody></table></div>
+    </section>
+
+    <aside class="goe-right"><section class="result-head"><h2>收益与损失</h2><span>实时计算</span></section>
+      <section class="result-block"><h3>已花费</h3><div class="result-line"><span>购买精华</span><b id="spent">0</b></div><div class="result-line"><span>转换命能</span><b id="lfSpent">0</b></div></section>
+      <section class="result-block"><h3>已获得</h3><div class="result-line"><span>直接出售</span><b id="direct">0</b></div><div class="result-line"><span>转换后出售</span><b id="earned">0</b></div></section>
+      <section class="profit-card"><span>预计利润</span><strong id="totalProfit">0</strong><small>ROI：<b id="totalRoi">0.00%</b></small></section>
+      <section class="result-block"><h3>保留 <span id="keepCount">0</span></h3><div id="keep" class="result-list"></div></section>
+      <section class="result-block"><h3>转换 <span id="flipCount">0</span></h3><div id="flip" class="result-list"></div></section>
+      <section class="result-block compact"><div class="result-line"><span>转换次数</span><b id="rolls">0</b></div><div class="result-line"><span>命能需求</span><b id="lfNeeded">0</b></div></section>
+      <section class="trade-box"><h3>Trade Links</h3><p>批量搜索选中的精华。</p><div class="trade-buttons"><button data-action="tradeSelected">✔ 已选择</button><button data-action="tradeKeep">$ 保留</button><button data-action="tradeFlip">↻ 转换</button></div></section>
+    </aside>
+  </main><footer>Gains of Exile 风格中文精华转换器 · 价格来源 poe.ninja · 非 Grinding Gear Games 官方项目</footer>`;
+  $('#currencyModeValue').value = state.currency==='chaos' ? 1 : 1;
+  $('#divChaos').value = state.divChaos;
+  $('#lfPerRoll').value = state.lfPerRoll;
+  $('#lfPerDiv').value = state.lfPerDiv;
+}
+
+function rows() {
+  const arr = ESSENCES.map(x => ({x, p: profit(x[0]), r: roi(x[0]), b: buyChaos(x[0]), s: sellChaos(x[0]), e: expectedSell(x[0])}));
+  if (state.sort === 'profit') arr.sort((a,b)=>b.p-a.p); else arr.sort((a,b)=>a.x[1].localeCompare(b.x[1],'zh'));
+  return arr;
+}
+function displayPrice(chaos) { return fmt(fromChaos(chaos), state.currency==='chaos'?2:1); }
+function renderTable() {
+  $('#table').innerHTML = rows().map(({x,p,r,b,s,e}) => { const id=x[0], q=state.qty[id]||0, selected=state.selected.has(id); const good=p>0; return `<tr class="${selected?'':'dim'}"><td class="sel"><input data-check="${id}" type="checkbox" ${selected?'checked':''}></td><td><a class="essence" href="${tradeLink(id)}" target="_blank" rel="noopener"><img src="${icon(id)}"><span><b>${esc(x[1])}</b><small>${esc(x[2])}</small></span></a></td><td><input class="cell qty" data-qty="${id}" type="number" min="0" value="${q}"></td><td><input class="cell price" data-buy="${id}" type="number" min="0" step="0.01" value="${state.prices[id].buy||''}" placeholder="0"></td><td><input class="cell price" data-sell="${id}" type="number" min="0" step="0.01" value="${state.prices[id].sell||''}" placeholder="0"></td><td class="number">${displayPrice(e)}</td><td class="number muted">${displayPrice(lfChaos())}</td><td class="number ${good?'up':'down'}">${p>=0?'+':''}${displayPrice(p)}</td><td class="number ${good?'up':'down'}">${(r*100).toFixed(1)}%</td><td><span class="tag ${good?'tag-good':'tag-bad'}">${good?'转换':'出售'}</span></td></tr>`; }).join('');
+  document.querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',e=>{const id=e.target.dataset.check;e.target.checked?state.selected.add(id):state.selected.delete(id);save();renderAll();}));
+  document.querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('input',e=>{state.qty[e.target.dataset.qty]=Math.max(0,num(e.target.value));save();renderResults();}));
+  document.querySelectorAll('[data-buy]').forEach(el=>el.addEventListener('input',e=>{state.prices[e.target.dataset.buy].buy=Math.max(0,num(e.target.value));save();renderAll();}));
+  document.querySelectorAll('[data-sell]').forEach(el=>el.addEventListener('input',e=>{state.prices[e.target.dataset.sell].sell=Math.max(0,num(e.target.value));save();renderAll();}));
+}
+function renderResults(){
+  const chosen=[...state.selected];
+  const spent=chosen.reduce((a,id)=>a+(state.qty[id]||0)*buyChaos(id),0);
+  const lfSpent=chosen.reduce((a,id)=>a+(state.qty[id]||0)*lfChaos(),0);
+  const direct=chosen.reduce((a,id)=>a+(state.qty[id]||0)*sellChaos(id),0);
+  const earned=chosen.reduce((a,id)=>a+(state.qty[id]||0)*expectedSell(id),0);
+  const net=earned-spent-lfSpent;
+  const totalQty=chosen.reduce((a,id)=>a+(state.qty[id]||0),0);
+  const keep=chosen.filter(id=>profit(id)<=0).sort((a,b)=>profit(a)-profit(b));
+  const flip=chosen.filter(id=>profit(id)>0).sort((a,b)=>profit(b)-profit(a));
+  $('#spent').textContent=displayPrice(spent);$('#lfSpent').textContent=displayPrice(lfSpent);$('#direct').textContent=displayPrice(direct);$('#earned').textContent=displayPrice(earned);
+  $('#totalProfit').textContent=(net>=0?'+':'')+displayPrice(net);$('#totalProfit').className=net>=0?'up':'down';$('#totalRoi').textContent=(spent?net/spent*100:0).toFixed(2)+'%';
+  $('#rolls').textContent=fmt(totalQty,0);$('#lfNeeded').textContent=fmt(totalQty*state.lfPerRoll,0);$('#keepCount').textContent=keep.length;$('#flipCount').textContent=flip.length;
+  const item=id=>{const x=ESSENCES.find(e=>e[0]===id);return `<a href="${tradeLink(id)}" target="_blank" rel="noopener"><img src="${icon(id)}"><span>${esc(x[1])}</span><b class="${profit(id)>0?'up':'down'}">${profit(id)>0?'+':''}${displayPrice(profit(id))}</b></a>`};
+  $('#keep').innerHTML=keep.map(item).join('')||'<div class="empty">暂无</div>';$('#flip').innerHTML=flip.map(item).join('')||'<div class="empty">暂无</div>';
+}
+function renderAll(){renderTable();renderResults();}
+function generate(){const min=Math.max(0,Math.floor(num($('#minQty').value))),max=Math.max(min,Math.floor(num($('#maxQty').value)));state.selected.forEach(id=>state.qty[id]=Math.floor(Math.random()*(max-min+1))+min);save();renderAll();}
+function demo(){const base=[486,486,486,486,486,486,486,486,486,486,486,486,486,486,486,486,486,486,486,486];ESSENCES.forEach(([id],i)=>{state.prices[id]={buy:base[i],sell:base[(i+3)%base.length]};state.qty[id]=i<5?20:0;});state.provider='示例数据';save();renderAll();}
+function clearPrices(){ESSENCES.forEach(([id])=>state.prices[id]={buy:0,sell:0});state.provider='本地价格';save();renderAll();}
+async function loadNinja(){
+  const btn=document.querySelector('[data-action="ninja"]');btn.disabled=true;btn.textContent='获取中…';$('#provider').textContent='正在读取 poe.ninja…';
+  try{
+    const league='Standard'; const r=await fetch(`https://poe.ninja/api/data/itemoverview?league=${league}&type=Essence`,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); const data=await r.json();
+    const lines=data.lines||[]; let count=0;
+    for(const [id,,en] of ESSENCES){const hit=lines.find(x=>String(x.name||'').toLowerCase()===en.toLowerCase());if(hit&&num(hit.chaosValue)>0){const v=num(hit.chaosValue);state.prices[id]={buy:fromChaos(v),sell:fromChaos(v)};count++;}}
+    state.provider=`poe.ninja · ${count}/20`;save();renderAll();
+  }catch(e){state.provider='Ninja 获取失败';$('#provider').textContent='Ninja 获取失败（保留当前价格）';console.error(e);}finally{btn.disabled=false;btn.textContent='从 poe.ninja 获取';}
+}
+function trade(ids){const links=ids.map(tradeLink).join('\n');if(navigator.clipboard)navigator.clipboard.writeText(links);else window.open(tradeLink(ids[0]),'_blank');}
+function bind(){
+  $('#divChaos').addEventListener('input',e=>{state.divChaos=Math.max(1,num(e.target.value,7150));save();renderAll();});
+  $('#lfPerRoll').addEventListener('input',e=>{state.lfPerRoll=Math.max(1,num(e.target.value,30));save();renderAll();});
+  $('#lfPerDiv').addEventListener('input',e=>{state.lfPerDiv=Math.max(1,num(e.target.value,22150));save();renderAll();});
+  document.querySelectorAll('[data-currency]').forEach(b=>b.addEventListener('click',()=>{state.currency=b.dataset.currency;save();shell();bind();renderAll();}));
+  document.querySelectorAll('[data-strategy]').forEach(b=>b.addEventListener('click',()=>{state.strategy=b.dataset.strategy;save();shell();bind();renderAll();}));
+  document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;
+    if(a==='reset'){localStorage.clear();location.reload();}
+    if(a==='ninja')loadNinja(); if(a==='demo')demo(); if(a==='import')loadNinja(); if(a==='generate')generate(); if(a==='sort'){state.sort=state.sort==='profit'?'name':'profit';renderAll();}
+    if(a==='all'){state.selected=new Set(ESSENCES.map(([id])=>id));renderAll();} if(a==='none'){state.selected.clear();renderAll();}
+    if(a==='good'){state.selected=new Set(ESSENCES.filter(([id])=>profit(id)>0).map(([id])=>id));renderAll();} if(a==='bad'){state.selected=new Set(ESSENCES.filter(([id])=>profit(id)<=0).map(([id])=>id));renderAll();}
+    if(a==='tradeSelected')trade([...state.selected]); if(a==='tradeKeep')trade(ESSENCES.filter(([id])=>state.selected.has(id)&&profit(id)<=0).map(([id])=>id)); if(a==='tradeFlip')trade(ESSENCES.filter(([id])=>state.selected.has(id)&&profit(id)>0).map(([id])=>id));
+  }));
+}
+function render(){shell();bind();renderAll();}
+render();
