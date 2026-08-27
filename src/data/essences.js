@@ -1,0 +1,5 @@
+export const ESSENCES = [
+  ['dread','厌恶','Deafening Essence of Dread'],['misery','苦难','Deafening Essence of Misery'],['envy','忌妒','Deafening Essence of Envy'],['scorn','刻毒','Deafening Essence of Scorn'],['spite','轻视','Deafening Essence of Spite'],['anguish','哀惜','Deafening Essence of Anguish'],['zeal','热情','Deafening Essence of Zeal'],['loathing','忌惮','Deafening Essence of Loathing'],['hatred','憎恨','Deafening Essence of Hatred'],['woe','悲痛','Deafening Essence of Woe'],['wrath','愤怒','Deafening Essence of Wrath'],['suffering','苦难','Deafening Essence of Suffering'],['torment','折磨','Deafening Essence of Torment'],['rage','暴怒','Deafening Essence of Rage'],['sorrow','悲伤','Deafening Essence of Sorrow'],['anger','愤怒','Deafening Essence of Anger'],['greed','贪婪','Deafening Essence of Greed'],['fear','恐惧','Deafening Essence of Fear'],['doubt','怀疑','Deafening Essence of Doubt'],['contempt','轻蔑','Deafening Essence of Contempt']
+];
+export const ICON_BASE='https://gains-of-exile.vercel.app/images/essences/';
+export const icon=(id)=>`${ICON_BASE}deafening-${id}.png`;
