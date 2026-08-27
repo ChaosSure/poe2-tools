@@ -1,6 +1,223 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GoE · 精华收益计算器</title><style>
-:root{--dark:#18191b;--dark2:#303236;--line:#ddd;--muted:#777;--green:#44bb00;--red:#771111}*{box-sizing:border-box}html,body{margin:0;background:#fff;color:#222;font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}.top{height:70px;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px}.nav{display:flex;gap:7px;align-items:center}.brand{font-size:36px;font-weight:800;letter-spacing:-2px;margin-right:18px}.nav a{height:40px;min-width:42px;padding:0 10px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#bbb;text-decoration:none}.nav a:hover,.nav .active{background:var(--dark2);color:#fff}.nav img{width:24px;height:24px;object-fit:contain}.faq{color:#ccc;text-decoration:none;font-size:14px}.main{max-width:1180px;margin:auto;padding:42px 34px 65px}.intro{font-size:16px;line-height:1.75;margin-bottom:42px}.intro p{margin:0 0 10px}.content{display:flex;flex-direction:column;align-items:center}.controls{width:700px;max-width:100%;display:flex;flex-direction:column;gap:20px}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.label{font-size:18px}.currency button,.plain{border:0;background:transparent;padding:5px 9px}.currency button.active{background:#eee;border:1px solid #ccc;border-radius:5px}.currency img,.inline{width:20px;height:20px;vertical-align:middle;object-fit:contain}.rate{display:flex;align-items:center;gap:5px;margin-left:14px}.input{width:75px;border:1px solid #aaa;border-radius:3px;padding:5px;background:#fff}.checks{margin-top:9px}.checks button{border:0;background:transparent;padding:5px 9px}.checks img{width:12px;vertical-align:middle}.generate{margin-top:8px;width:50%;min-width:190px;border:0;background:#222;color:#fff;border-radius:4px;padding:7px;font-size:21px}.items-wrap{width:760px;max-width:100%;margin-top:30px}.items-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.items-head h2{font-size:20px;margin:0}.muted{font-size:13px;color:var(--muted)}.items{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.item{border:1px solid var(--line);border-radius:6px;padding:10px;display:grid;grid-template-columns:43px 1fr 30px;gap:8px;align-items:center;min-height:105px}.item img.icon{width:38px;height:38px}.name{text-align:center;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.en{text-align:center;color:#999;font-size:10px;margin:2px 0 5px}.fields{display:flex;flex-direction:column;gap:4px}.field{font-size:11px;color:#777;display:flex;align-items:center;gap:3px}.field input{width:52px;height:24px;border:1px solid #bbb;border-radius:2px}.check{text-align:center}.check input{width:17px;height:17px}.cheat,.results{width:760px;max-width:100%}.cheat{margin-top:48px}.cheat h1,.results h1{text-align:center;font-size:22px;font-weight:600}.strategy-title{font-size:14px;margin:10px 0 6px}.help{display:inline-flex;width:21px;height:21px;border:1px solid #69f;border-radius:50%;align-items:center;justify-content:center;color:#36c}.strategy{display:inline-flex;border:1px solid #666;border-radius:4px;overflow:hidden}.strategy button{border:0;background:#fff;color:#777;padding:6px 13px}.strategy button+button{border-left:1px solid #666}.strategy .active{background:#555;color:#fff}.cheat-row{display:flex;margin-top:22px}.tag{width:70px;font-size:22px;padding-top:13px;flex:none}.keep{color:var(--green)}.flip{color:var(--red)}.chips{display:flex;flex-wrap:wrap;gap:14px}.chip{width:42px;text-align:center;font-size:10px;position:relative}.chip img{width:36px;height:36px;display:block;margin:auto}.value{position:absolute;top:27px;right:-7px;background:#fff;font-size:10px}.pos{color:#44bb00}.neg{color:#f22}.results{margin-top:42px;padding:15px}.expected{font-size:18px;line-height:1.9}.section{font-size:18px;line-height:1.85}.section h2{font-size:20px;margin:5px 0}.line{display:flex;align-items:center;min-height:31px}.rl{width:210px}.money{font-weight:700;min-width:45px;text-align:right;margin-right:5px}.roi{font-size:19px;font-weight:700}.footer{background:var(--dark);color:#ccc;padding:10px;display:flex;justify-content:space-between;font-size:13px}.footer a{color:#ddd;text-decoration:none}@media(max-width:800px){.items{grid-template-columns:repeat(2,1fr)}.main{padding:30px 20px 50px}}@media(max-width:520px){.top{height:58px}.brand{font-size:29px;margin-right:4px}.nav a{padding:0 6px;min-width:34px}.nav a:nth-of-type(n+5){display:none}.main{padding:24px 14px}.intro{font-size:14px;margin-bottom:28px}.items{grid-template-columns:1fr}.footer span{display:none}.generate{width:100%}.rl{width:175px}}
-</style></head><body><header class="top"><div class="nav"><a class="brand" href="#">GoE</a><a class="active" href="#essences"><img src="https://gains-of-exile.vercel.app/images/essences/deafening-greed.png" alt="精华"></a><a href="#"><img src="https://gains-of-exile.vercel.app/images/essences/corrupt-insanity.png" alt="高级精华"></a><a href="#"><img src="https://gains-of-exile.vercel.app/images/fossils/serrated.png" alt="化石"></a><a href="#"><img src="https://gains-of-exile.vercel.app/images/catalysts/noxious.png" alt="催化剂"></a><a href="#"><img src="https://gains-of-exile.vercel.app/images/oils/azure.png" alt="油"></a></div><a class="faq" href="#">帮助 / FAQ</a></header><main class="main" id="essences"><section class="intro"><p>欢迎，流放者。你来到了 <b>Gains of Exile 中文版</b> —— 一个帮助计算《流放之路》最佳货币转换收益的工具。</p><p>中文亮色 Demo 保留原 GoE 的信息密度、操作逻辑和视觉排版。</p></section><div class="content"><section class="controls"><div class="row currency"><span class="label">货币：</span><button class="active"><img src="https://gains-of-exile.vercel.app/images/chaos.png"></button><button>1 / <img src="https://gains-of-exile.vercel.app/images/divine.png"></button><span class="rate"><input id="rate" class="input" value="150" type="number" min="1"> × <img class="inline" src="https://gains-of-exile.vercel.app/images/chaos.png"> = <img class="inline" src="https://gains-of-exile.vercel.app/images/divine.png"></span><button class="plain">PW</button></div><div class="row"><span class="label">物品价格：</span><button class="plain" onclick="zero()">设为 0</button><button class="plain" onclick="demo()">载入示例</button><button class="plain">PW</button></div><div><div class="row"><span class="label">数量生成：</span><span>介于</span><input id="min" class="input" value="50" type="number"><span>和</span><input id="max" class="input" value="500" type="number"><span>之间</span></div><div class="checks"><span class="label">复选框：</span><button onclick="all(true)">全部</button><button onclick="all(false)">无</button><button onclick="good()">高收益</button></div><button class="generate" onclick="generate()">← 生成 →</button></div></section><section class="items-wrap"><div class="items-head"><h2>精华</h2><span class="muted">数量 / 价格 / 计算</span></div><div id="items" class="items"></div></section><section class="cheat"><h1>翻转速查表</h1><div class="strategy-title">策略 <span class="help">?</span></div><div class="strategy"><button class="active">一步转换</button><button>最优路线</button></div><div class="cheat-row"><span class="tag keep">保留：</span><div id="keep" class="chips"></div></div><div class="cheat-row"><span class="tag flip">翻转：</span><div id="flip" class="chips"></div></div></section><section class="results"><h1>结果</h1><div class="expected">预计翻转次数：<b id="fc">0</b></div><div class="expected">预计需要生命力：<b id="life">0</b> <img class="inline" src="https://gains-of-exile.vercel.app/images/lifeforces/primal.png"></div><div class="section"><h2>成本与收益</h2><div class="line"><span class="rl">不进行翻转：</span><b id="base" class="money">0</b> 混沌石</div><div class="line"><span class="rl">购买生命力：</span><b id="cost" class="money">0</b> 混沌石</div><div class="line"><span class="rl">出售转换物：</span><b id="sell" class="money">0</b> 混沌石</div></div><div class="section"><h2>预计利润</h2><div class="line"><span class="rl">总计：</span><b id="profit" class="money">0</b> 混沌石</div><div class="roi">投资回报率：<span id="roi">0.00%</span></div></div></section></div></main><footer class="footer"><a href="#">反馈</a><span>Gains of Exile 中文 Demo · 非 Grinding Gear Games 官方项目</span><a href="#">支持开发</a></footer><script>
-const D=[['dread','恐惧','Dread'],['misery','悲惨','Misery'],['envy','忌妒','Envy'],['scorn','鄙夷','Scorn'],['spite','轻蔑','Spite'],['anguish','痛苦','Anguish'],['zeal','狂热','Zeal'],['loathing','憎恨','Loathing'],['doubt','怀疑','Doubt'],['wrath','愤怒','Wrath'],['suffering','苦难','Suffering'],['rage','暴怒','Rage'],['sorrow','悲伤','Sorrow'],['torment','折磨','Torment'],['anger','愤怒','Anger'],['fear','恐惧','Fear'],['woe','悲恸','Woe'],['hatred','憎恨','Hatred'],['contempt','轻视','Contempt'],['greed','贪婪','Greed']];const P=[8,8,7,6,6,5,10,8,5,5,4,5,5,5,4,4,4,4,4,4];let s=D.map((x,i)=>({id:x[0],cn:x[1],en:x[2],qty:100,price:P[i]}));const I=id=>`https://gains-of-exile.vercel.app/images/essences/deafening-${id}.png`;
-function render(){items.innerHTML=s.map((x,i)=>`<div class="item"><img class="icon" src="${I(x.id)}"><div><div class="name">${x.cn}</div><div class="en">${x.en}</div><div class="fields"><label class="field">数量 <input type="number" value="${x.qty}" min="0" oninput="s[${i}].qty=+this.value;calc()"></label><label class="field">价格 <input type="number" value="${x.price}" min="0" step=".25" oninput="s[${i}].price=+this.value;calc()"></label></div></div><label class="check"><input class="cb" type="checkbox" ${i<12?'checked':''} onchange="calc()"></label></div>`).join('');calc()}
-function act(){return [...document.querySelectorAll('.cb')].map((e,i)=>e.checked?s[i]:null).filter(Boolean)}function calc(){let a=act(),q=a.reduce((n,x)=>n+x.qty,0),gross=a.reduce((n,x)=>n+x.qty*x.price,0),f=Math.floor(q/3),lifev=f*30,c=lifev*.04,profit=Math.max(0,gross-c-q*1.1);fc.textContent=f.toLocaleString();life.textContent=lifev.toLocaleString();base.textContent=Math.round(gross).toLocaleString();cost.textContent=Math.round(c).toLocaleString();sell.textContent=Math.round(gross).toLocaleString();document.getElementById('profit').textContent=Math.round(profit).toLocaleString();roi.textContent=(profit/Math.max(1,q*1.1)*100).toFixed(2)+'%';let z=[...s].sort((a,b)=>b.price-a.price);keep.innerHTML=z.slice(0,5).map(x=>chip(x,true)).join('');flip.innerHTML=z.slice(5).map(x=>chip(x,false)).join('')}function chip(x,k){let v=k?(-Math.max(0,10-x.price)).toFixed(2):(Math.max(0,x.price-5)*.31).toFixed(2);return `<div class="chip"><img src="${I(x.id)}"><span class="value ${k?'neg':'pos'}">${v}</span><span>${x.en}</span></div>`}function all(v){document.querySelectorAll('.cb').forEach(e=>e.checked=v);calc()}function good(){document.querySelectorAll('.cb').forEach((e,i)=>e.checked=s[i].price>=7);calc()}function zero(){s.forEach(x=>x.price=0);render()}function demo(){s.forEach((x,i)=>x.price=P[i]);render()}function generate(){let a=+min.value,b=+max.value;s.forEach(x=>x.qty=Math.floor(a+Math.random()*(b-a+1)));render()}rate.addEventListener('input',calc);render();</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GoE • 精华</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;background:#fff;color:#222;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.top{display:flex;flex-direction:row;align-items:center;justify-content:space-between;background:#18181b;color:#fff;padding:14px 16px;height:68px}
+.nav{display:flex;flex-direction:row;align-items:center;gap:10px}
+.brand{margin-right:18px;text-decoration:none;font-size:36px;font-weight:800;letter-spacing:-2px}
+.nav-button{display:flex;align-items:center;justify-content:center;min-width:42px;height:38px;padding:4px 9px;border-radius:5px;text-decoration:none;color:#bbb}
+.nav-button:hover,.nav-button.active{background:#303033;color:#fff}
+.nav-button img{width:24px;height:24px;object-fit:contain}
+.faq{font-size:15px;text-decoration:none;color:#ddd}
+.page{display:flex;flex-direction:column;min-height:calc(100vh - 68px)}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:5% 5% 60px}
+.intro{align-self:stretch;max-width:1180px;margin:0 auto 44px;font-size:17px;line-height:1.7}
+.intro p{margin:0 0 10px}
+.content{display:flex;flex-direction:column;align-items:center;width:100%;max-width:1180px}
+.controls{display:flex;flex-direction:column;gap:20px;width:720px;max-width:100%}
+.row{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap}
+.label{font-size:19px;margin-right:4px}
+.currency button,.plain{border:0;background:transparent;padding:4px 8px;color:#222}
+.currency button:hover,.plain:hover{background:#f1f1f1;border-radius:4px}
+.currency .chosen{background:#eee;border-radius:4px}
+.icon16{width:16px;height:16px;object-fit:contain;vertical-align:middle}
+.icon20{width:20px;height:20px;object-fit:contain;vertical-align:middle}
+.rate{display:flex;align-items:center;gap:5px;margin-left:12px}
+.number{width:72px;height:28px;padding:2px 7px;border:1px solid #aaa;border-radius:2px;background:#fff}
+.checks{margin-top:12px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.checks button{border:0;background:transparent;padding:4px 9px}
+.generate{display:block;margin-top:6px;width:50%;min-width:210px;padding:5px 10px;border:0;background:#222;color:#fff;font-size:22px;border-radius:3px}
+.generate:hover{background:#444}
+.items{width:760px;max-width:100%;margin-top:34px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.item{display:flex;flex-direction:row;align-items:stretch;gap:9px;padding:11px;border:1px solid rgba(39,39,42,.18);border-radius:7px;min-height:108px}
+.item:hover{border-color:#999}
+.item-main{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:50px;flex:none;overflow:hidden}
+.item-main img{width:38px;height:38px;object-fit:contain}
+.item-name{margin-top:5px;font-size:13px;white-space:nowrap}
+.item-en{font-size:9px;color:#999;white-space:nowrap}
+.item-fields{display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0}
+.field-row{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:13px;color:#555;min-height:27px}
+.field-row input{width:58px;height:25px;padding:2px 4px;border:1px solid #aaa;border-radius:2px;background:#fff}
+.gen-check{display:flex;align-items:center;justify-content:center;width:25px;flex:none}
+.gen-check input{width:17px;height:17px}
+.cheat{width:760px;max-width:100%;margin-top:48px}
+.cheat h1,.results h1{text-align:center;font-size:22px;font-weight:500;margin:0 0 18px}
+.strategy-title{font-size:14px;margin-bottom:7px}
+.help{display:inline-flex;position:relative;width:22px;height:22px;align-items:center;justify-content:center;border:1px solid #60a5fa;border-radius:50%;color:#3b82f6;font-size:12px}
+.strategy{display:inline-flex;overflow:hidden;border:1px solid #555;border-radius:4px}
+.strategy button{border:0;background:#fff;color:#777;padding:6px 13px;font-size:14px}
+.strategy button+button{border-left:1px solid #555}
+.strategy button.active{background:#555;color:#fff}
+.cheat-line{display:flex;align-items:flex-start;margin-top:30px}
+.tag{width:72px;flex:none;margin-top:8px;font-size:22px;line-height:1}
+.keep{color:#44bb00}.flip{color:#771111}
+.chips{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px 10px}
+.chip{position:relative;width:40px;display:flex;flex-direction:column;align-items:center;font-size:10px}
+.chip img{width:36px;height:36px;object-fit:contain}
+.chip .value{position:absolute;top:27px;right:-8px;background:#fff;padding:0 2px;font-size:10px;line-height:14px}
+.pos{color:#44bb00}.neg{color:#f11}
+.results{width:760px;max-width:100%;margin-top:46px;padding:0 10px}
+.results-block{font-size:18px;line-height:1.85}
+.results-block h2{font-size:20px;font-weight:500;margin:5px 0}
+.result-line{display:flex;align-items:center;min-height:32px}
+.result-label{display:inline-block;width:205px}
+.result-num{display:inline-block;width:65px;text-align:right;font-weight:700;margin-right:6px}
+.roi{font-size:19px;font-weight:700;margin-top:3px}
+.footer{display:flex;flex-direction:row;align-items:center;justify-content:space-between;background:#18181b;color:#ccc;padding:7px 8px;font-size:14px}
+.footer a{text-decoration:none;color:#ddd}
+.footer a:hover{text-decoration:underline}
+@media(max-width:800px){
+ .main{padding:30px 5% 50px}
+ .items{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+ .top{height:58px;padding:9px 10px}.brand{font-size:29px;margin-right:5px}.nav{gap:3px}.nav-button{min-width:34px;padding:3px 5px}.nav-button:nth-of-type(n+6){display:none}.faq{font-size:12px}
+ .main{padding:24px 14px 40px}.intro{font-size:14px;margin-bottom:30px}
+ .controls{gap:17px}.label{font-size:17px}.rate{margin-left:0}
+ .generate{width:100%}
+ .items{grid-template-columns:1fr;margin-top:28px}
+ .cheat,.results{width:100%}.tag{width:65px}
+ .footer{font-size:11px}.footer span{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+  <div class="nav">
+    <a class="brand" href="./">GoE</a>
+    <a class="nav-button active" href="#essences"><img src="https://gains-of-exile.vercel.app/images/essences/deafening-greed.png" alt="精华"></a>
+    <a class="nav-button" href="#"><img src="https://gains-of-exile.vercel.app/images/essences/corrupt-insanity.png" alt="高级精华"></a>
+    <a class="nav-button" href="#"><img src="https://gains-of-exile.vercel.app/images/fossils/serrated.png" alt="化石"></a>
+    <a class="nav-button" href="#"><img src="https://gains-of-exile.vercel.app/images/catalysts/noxious.png" alt="催化剂"></a>
+    <a class="nav-button" href="#"><img src="https://gains-of-exile.vercel.app/images/oils/azure.png" alt="精油"></a>
+    <a class="nav-button" href="#"><img src="https://gains-of-exile.vercel.app/images/delirium-orbs/singular.png" alt="迷雾玉"></a>
+  </div>
+  <a class="faq" href="#">📜 帮助 / FAQ</a>
+</header>
+
+<main class="main" id="essences">
+  <section class="intro">
+    <p>欢迎，流放者。你来到了 <b>Gains of Exile 中文版</b> —— 一个帮助计算《流放之路》最佳货币转换收益的工具。</p>
+    <p>本页面采用 GoE 原版的扁平布局：不使用 SiliconUI 式卡片，不使用大面积面板，保持原站的信息密度和操作方式。</p>
+  </section>
+
+  <div class="content">
+    <section class="controls">
+      <div class="row currency">
+        <span class="label">货币：</span>
+        <button class="chosen"><img class="icon16" src="https://gains-of-exile.vercel.app/images/chaos.png" alt="混沌石"></button>
+        <button><span style="font-size:20px"><sup>1</sup>/<sub><img class="icon16" src="https://gains-of-exile.vercel.app/images/divine.png" alt="神圣石"></sub></span></button>
+        <span class="rate"><input id="rate" class="number" type="number" value="150" min="1" max="9999" step="0.5"> × <img class="icon20" src="https://gains-of-exile.vercel.app/images/chaos.png"> = <img class="icon20" src="https://gains-of-exile.vercel.app/images/divine.png"></span>
+        <button class="plain">PW</button>
+      </div>
+
+      <div>
+        <div class="row"><span class="label">物品价格：</span><button class="plain" onclick="zeroPrices()">设为 0</button><button class="plain" onclick="loadDemo()">载入示例</button><button class="plain">PW</button></div>
+      </div>
+
+      <div>
+        <div class="row"><span class="label">数量生成：</span><span>介于</span><input id="minQty" class="number" value="50" type="number" min="0" max="100"><span>和</span><input id="maxQty" class="number" value="500" type="number" min="50" max="10000"><span>之间</span></div>
+        <div class="checks"><span class="label">复选框：</span><button onclick="setAll(true)">全部</button><button onclick="setAll(false)">无</button><button onclick="setGood()">高收益 <img class="icon16" src="https://gains-of-exile.vercel.app/images/flip2.png"></button><button onclick="setBad()">低收益 <img class="icon16" src="https://gains-of-exile.vercel.app/images/flip2.png"></button></div>
+        <button class="generate" onclick="generateQuantities">← 生成 →</button>
+      </div>
+    </section>
+
+    <section class="items" id="items"></section>
+
+    <section class="cheat">
+      <h1>翻转速查表</h1>
+      <div class="strategy-title">策略 <span class="help">?</span></div>
+      <div class="strategy"><button class="active">一步转换</button><button>最优路线</button></div>
+      <div class="cheat-line"><span class="tag keep">保留：</span><div class="chips" id="keep"></div></div>
+      <div class="cheat-line"><span class="tag flip">翻转：</span><div class="chips" id="flip"></div></div>
+    </section>
+
+    <section class="results">
+      <h1>结果</h1>
+      <div class="results-block">
+        <div>预计翻转次数：<b id="flipCount">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/flip2.png"></div>
+        <div>预计需要生命力：<b id="lifeForce">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/lifeforces/primal.png"></div>
+      </div>
+      <div class="results-block">
+        <h2>成本与收益</h2>
+        <div class="result-line"><span class="result-label">不进行翻转：</span><b id="baseCost" class="result-num">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/chaos.png"></div>
+        <div class="result-line"><span class="result-label">购买生命力：</span><b id="lifeCost" class="result-num">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/chaos.png"></div>
+        <div class="result-line"><span class="result-label">出售转换物：</span><b id="sellValue" class="result-num">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/chaos.png"></div>
+      </div>
+      <div class="results-block">
+        <h2>预计利润</h2>
+        <div class="result-line"><span class="result-label">总计：</span><b id="profit" class="result-num">0</b> <img class="icon16" src="https://gains-of-exile.vercel.app/images/chaos.png"></div>
+        <div class="roi">投资回报率：<span id="roi">0.00%</span></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <a href="#">🩸 反馈</a>
+  <span>Gains of Exile 中文 Demo · 非 Grinding Gear Games 官方项目</span>
+  <a href="#">☕ 支持开发</a>
+</footer>
+</div>
+
+<script>
+const IMG='https://gains-of-exile.vercel.app/images/essences/deafening-';
+const DATA=[
+ ['dread','恐惧','Dread',8],['misery','悲惨','Misery',8],['envy','忌妒','Envy',7],['scorn','鄙夷','Scorn',6],['spite','轻蔑','Spite',6],['anguish','痛苦','Anguish',5],['zeal','狂热','Zeal',10],['loathing','憎恨','Loathing',8],['doubt','怀疑','Doubt',5],['wrath','愤怒','Wrath',5],['suffering','苦难','Suffering',4],['rage','暴怒','Rage',5],['sorrow','悲伤','Sorrow',5],['torment','折磨','Torment',5],['anger','愤怒','Anger',4],['fear','恐惧','Fear',4],['woe','悲恸','Woe',4],['hatred','憎恨','Hatred',4],['contempt','轻视','Contempt',4],['greed','贪婪','Greed',4]
+];
+let items=DATA.map(x=>({id:x[0],cn:x[1],en:x[2],price:x[3],qty:100,checked:true}));
+function render(){
+ document.getElementById('items').innerHTML=items.map((x,i)=>`<div class="item"><div class="item-main"><img src="${IMG+x.id}.png" alt="${x.en}"><div class="item-name">${x.cn}</div><div class="item-en">${x.en}</div></div><div class="item-fields"><div class="field-row"><span>数量：</span><input type="number" min="0" max="10000" value="${x.qty}" oninput="items[${i}].qty=+this.value;calculate()"></div><div class="field-row"><span>价格：</span><input type="number" min="0" max="1000" step="0.25" value="${x.price}" oninput="items[${i}].price=+this.value;calculate()"></div><div class="field-row"><span>生成：</span></div></div><label class="gen-check"><input class="item-check" type="checkbox" ${x.checked?'checked':''} onchange="items[${i}].checked=this.checked;calculate()"></label></div>`).join('');
+ calculate();
+}
+function selected(){return items.filter(x=>x.checked)}
+function calculate(){
+ const a=selected();
+ const qty=a.reduce((n,x)=>n+x.qty,0);
+ const value=a.reduce((n,x)=>n+x.qty*x.price,0);
+ const flips=Math.floor(qty/3);
+ const life=flips*30;
+ const lifeCost=life*0.04;
+ const investment=Math.max(1,qty*1.1);
+ const profit=value-lifeCost-investment;
+ document.getElementById('flipCount').textContent=flips.toLocaleString();
+ document.getElementById('lifeForce').textContent=life.toLocaleString();
+ document.getElementById('baseCost').textContent=Math.round(value).toLocaleString();
+ document.getElementById('lifeCost').textContent=Math.round(lifeCost).toLocaleString();
+ document.getElementById('sellValue').textContent=Math.round(value).toLocaleString();
+ document.getElementById('profit').textContent=Math.round(profit).toLocaleString();
+ document.getElementById('roi').textContent=(profit/investment*100).toFixed(2)+'%';
+ const sorted=[...items].sort((a,b)=>b.price-a.price);
+ document.getElementById('keep').innerHTML=sorted.slice(0,5).map(x=>chip(x,true)).join('');
+ document.getElementById('flip').innerHTML=sorted.slice(5).map(x=>chip(x,false)).join('');
+}
+function chip(x,keep){
+ const v=keep?(-Math.max(0,10-x.price)).toFixed(2):(Math.max(0,x.price-5)*.31).toFixed(2);
+ return `<div class="chip"><img src="${IMG+x.id}.png"><span class="value ${keep?'neg':'pos'}">${v}</span><span>${x.en}</span></div>`;
+}
+function setAll(v){items.forEach(x=>x.checked=v);render()}
+function setGood(){items.forEach(x=>x.checked=x.price>=7);render()}
+function setBad(){items.forEach(x=>x.checked=x.price<=5);render()}
+function zeroPrices(){items.forEach(x=>x.price=0);render()}
+function loadDemo(){items.forEach((x,i)=>x.price=DATA[i][3]);render()}
+function generateQuantities(){
+ const a=Number(document.getElementById('minQty').value)||0;
+ const b=Number(document.getElementById('maxQty').value)||100;
+ const min=Math.min(a,b),max=Math.max(a,b);
+ items.forEach(x=>x.qty=Math.floor(min+Math.random()*(max-min+1)));
+ render();
+}
+document.getElementById('rate').addEventListener('input',calculate);
+render();
+</script>
+</body>
+</html>
