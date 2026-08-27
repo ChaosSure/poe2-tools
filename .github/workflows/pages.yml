@@ -20,15 +20,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+
+      # The repository currently has no package-lock.json.
+      # Do not enable npm caching here because setup-node requires
+      # a lockfile when cache: npm is used.
       - name: Install dependencies
         run: npm install
+
       - name: Build
         run: npm run build
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
